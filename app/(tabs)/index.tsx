@@ -1,98 +1,157 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import { StyleSheet, View, Dimensions } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={styles.container}>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+      <View style={styles.header}>
+        <ThemedText style={styles.name}>
+          Michaela Darry G. Bagay
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+
+      <View style={styles.heroSection}>
+        <View style={styles.textSide}>
+          <View style={styles.titleWrapper}>
+            <ThemedText style={styles.heroTitle}>
+              My first
+            </ThemedText>
+
+            <View style={styles.highlight}>
+              <ThemedText style={styles.highlightText}>
+                mobile app
+              </ThemedText>
+            </View>
+          </View>
+
+          <ThemedText style={styles.description}>
+            I plan to develop{' '}
+            <ThemedText style={styles.inlineHighlight}>
+              a budgeting app
+            </ThemedText>{' '}
+            that will help users track their expenses, manage their income,
+            and monitor their spending habits.
+          </ThemedText>
+
+          <ThemedText type="subtitle" style={styles.smallSubtitle}>
+            Ayaw sa i-judge sir (╥ ᴗ ╥)
+          </ThemedText>
+        </View>
+
+        <View style={styles.pictureSection}>
+          <View style={styles.imageGlow} />
+          <Image
+            source={require('@/assets/images/sampleImage.png')}
+            style={styles.picture}
+            contentFit="contain"
+          />
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#3B0A18',
+    position: 'relative',
+    paddingHorizontal: 34,
+    paddingTop: 45,
+    overflow: 'hidden',
+  },
+
+  header: {
+    marginTop: 20,
+  },
+
+  name: {
+    fontSize: 25,
+    fontWeight: '700',
+  },
+
+  heroSection: {
+    flex: 1,
+    flexDirection: width < 650 ? 'column' : 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+
+  textSide: {
+    flex: 1,
+    maxWidth: 560,
+    paddingRight: width < 650 ? 0 : 30,
+    zIndex: 2,
+    justifyContent: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+
+  titleWrapper: {
+    marginBottom: 22,
+  },
+
+  heroTitle: {
+    fontSize: 45,
+    lineHeight: 60,
+    fontWeight: '800',
+  },
+
+  highlight: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E7A0AA',
+    paddingHorizontal: 12,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+
+  highlightText: {
+    fontSize: width < 500 ? 48 : 64,
+    lineHeight: width < 500 ? 56 : 70,
+    fontWeight: '800',
+    color: '#3B0A18',
+    letterSpacing: -2,
+  },
+
+  description: {
+    fontSize: 18,
+    opacity: 0.88,
+  },
+
+  inlineHighlight: {
+    fontWeight: '800',
+    color: '#E7A0AA',
+  },
+
+  smallSubtitle: {
+    fontSize: 14,
+    lineHeight: 21,
+    opacity: 0.5,
+    maxWidth: 330,
+    marginTop: 18,
+  },
+
+  pictureSection: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+
+  imageGlow: {
     position: 'absolute',
+    width: width < 500 ? 260 : 360,
+    height: width < 500 ? 260 : 360,
+    borderRadius: 200,
+    backgroundColor: 'rgba(231, 160, 170, 0.08)',
+  },
+
+  picture: {
+    width: width < 500 ? 330 : 470,
+    height: width < 500 ? 350 : 480,
+    zIndex: 1,
   },
 });
