@@ -52,6 +52,13 @@ export default function HomeScreen() {
             onPress={() => router.push('/activity3')}
           />
 
+          <ActivityCard
+            number="4"
+            title="Simple Calculator App"
+            description="Mini Project: Simple Calculator"
+            onPress={() => router.push('/activity4')}
+          />
+
         </View>
 
       </ScrollView>

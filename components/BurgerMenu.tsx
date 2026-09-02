@@ -79,6 +79,14 @@ export default function BurgerMenu() {
               <Text style={styles.menuText}>Activity 3</Text>
             </Pressable>
 
+            <Pressable
+              style={styles.menuItem}
+              onPress={() => navigateTo('/activity4')}
+            >
+              <Text style={styles.menuIcon}>④</Text>
+              <Text style={styles.menuText}>Activity 4</Text>
+            </Pressable>
+
           </View>
         </View>
       </Modal>
