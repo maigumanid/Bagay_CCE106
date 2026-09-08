@@ -1,31 +1,86 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+export const COLORS = {
+  background: '#0D0D0D',
+  surface: '#181818',
+  surfaceSecondary: '#242424',
 
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+  primary: '#E10600',
+
+  textPrimary: '#FFFFFF',
+  textSecondary: '#999999',
+  textMuted: '#6F6F6F',
+
+  border: '#292929',
+} as const;
+
+export const TYPOGRAPHY = {
+  brand: {
+    fontSize: 11,
+    fontWeight: '800' as const,
+    letterSpacing: 2,
   },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+
+  screenTitle: {
+    fontSize: 28,
+    fontWeight: '800' as const,
   },
-};
+
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: '700' as const,
+  },
+
+  metricValue: {
+    fontSize: 28,
+    fontWeight: '800' as const,
+  },
+
+  metricLabel: {
+    fontSize: 12,
+    fontWeight: '600' as const,
+    letterSpacing: 0.8,
+  },
+
+  body: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+  },
+
+  caption: {
+    fontSize: 12,
+    fontWeight: '400' as const,
+  },
+
+  action: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+  },
+
+  footer: {
+    fontSize: 9,
+    fontWeight: '600' as const,
+    letterSpacing: 1.5,
+  },
+} as const;
+
+export const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+  xxl: 28,
+  xxxl: 30,
+} as const;
+
+export const RADIUS = {
+  sm: 8,
+  md: 12,
+  lg: 14,
+  xl: 16,
+  round: 999,
+} as const;
 
 export const Fonts = Platform.select({
   ios: {
