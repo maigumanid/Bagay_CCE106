@@ -1,53 +1,60 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+// constants/theme.ts
 
-import { Platform } from 'react-native';
+export const COLORS = {
+  maroon: '#800000',
+  maroonDark: '#5C0000',
+  maroonLight: '#A52A2A',
+  maroonSoft: '#F7EAEA',
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+  background: '#F7F7F7',
+  surface: '#FFFFFF',
 
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+  textPrimary: '#242424',
+  textSecondary: '#666666',
+  textLight: '#888888',
+
+  border: '#E3E3E3',
+
+  gray: '#777777',
+  lightGray: '#F0F0F0',
+
+  success: '#2E7D32',
+  error: '#B3261E',
+
+  white: '#FFFFFF',
+  black: '#000000',
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
+export const TYPOGRAPHY = {
+  title: 28,
+  heading: 21,
+  subheading: 17,
+  body: 15,
+  caption: 13,
+  small: 12,
+};
+
+export const DESIGN = {
+  radiusSmall: 8,
+  radiusMedium: 12,
+  radiusLarge: 16,
+
+  spacingXS: 6,
+  spacingSM: 10,
+  spacingMD: 16,
+  spacingLG: 24,
+  spacingXL: 32,
+
+  borderWidth: 1,
+};
+
+export const SHADOW = {
+  shadowColor: '#000000',
+  shadowOffset: {
+    width: 0,
+    height: 2,
   },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+  shadowOpacity: 0.08,
+  shadowRadius: 5,
+  elevation: 2,
+};
