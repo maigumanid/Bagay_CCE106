@@ -1,13 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
-import { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 
 import AppButton from '../../components/AppButton';
@@ -17,60 +19,74 @@ import { profile } from '../../data/profile';
 const PROFILE_KEY = '@studyflow_profile';
 
 export default function ProfileScreen() {
-  const [fullName, setFullName] = useState('');
-  const [program, setProgram] = useState('');
+  const [savedName, setSavedName] = useState(profile.fullName);
+  const [savedProgram, setSavedProgram] = useState(profile.program);
+
+  const [fullName, setFullName] = useState(profile.fullName);
+  const [program, setProgram] = useState(profile.program);
+
   const [nameError, setNameError] = useState('');
   const [programError, setProgramError] = useState('');
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    loadProfile();
-  }, []);
 
   const loadProfile = async () => {
     try {
-      const savedProfile = await AsyncStorage.getItem(PROFILE_KEY);
+      const storedProfile = await AsyncStorage.getItem(PROFILE_KEY);
 
-      if (savedProfile) {
-        const parsed = JSON.parse(savedProfile);
-
-        setFullName(parsed.fullName);
-        setProgram(parsed.program);
+      if (storedProfile) {
+        const parsed = JSON.parse(storedProfile);
 
         profile.fullName = parsed.fullName;
         profile.program = parsed.program;
+
+        setSavedName(parsed.fullName);
+        setSavedProgram(parsed.program);
+
+        setFullName(parsed.fullName);
+        setProgram(parsed.program);
       } else {
+        setSavedName(profile.fullName);
+        setSavedProgram(profile.program);
+
         setFullName(profile.fullName);
         setProgram(profile.program);
       }
-    } catch (error) {
-      setFullName(profile.fullName);
-      setProgram(profile.program);
+    } catch {
+      Alert.alert('Error', 'Unable to load profile.');
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+    }, [])
+  );
 
   const saveProfile = async () => {
     setNameError('');
     setProgramError('');
-    setSaved(false);
+
+    const cleanName = fullName.trim();
+    const cleanProgram = program.trim();
 
     let valid = true;
 
-    if (!fullName.trim()) {
+    if (!cleanName) {
       setNameError('Student name is required.');
       valid = false;
     }
 
-    if (!program.trim()) {
-      setProgramError('Course is required.');
+    if (!cleanProgram) {
+      setProgramError('Course / Program is required.');
       valid = false;
     }
 
-    if (!valid) return;
+    if (!valid) {
+      return;
+    }
 
     const updatedProfile = {
-      fullName: fullName.trim(),
-      program: program.trim(),
+      fullName: cleanName,
+      program: cleanProgram,
     };
 
     try {
@@ -79,42 +95,92 @@ export default function ProfileScreen() {
         JSON.stringify(updatedProfile)
       );
 
-      profile.fullName = updatedProfile.fullName;
-      profile.program = updatedProfile.program;
+      profile.fullName = cleanName;
+      profile.program = cleanProgram;
 
-      setFullName(updatedProfile.fullName);
-      setProgram(updatedProfile.program);
+      setSavedName(cleanName);
+      setSavedProgram(cleanProgram);
 
-      setSaved(true);
+      setFullName(cleanName);
+      setProgram(cleanProgram);
 
-      Alert.alert('Saved', 'Profile information has been saved.');
-    } catch (error) {
-      Alert.alert('Error', 'Unable to save profile.');
+      Alert.alert(
+        'Profile Saved',
+        'Your profile has been updated successfully.'
+      );
+    } catch {
+      Alert.alert(
+        'Error',
+        'Unable to save your profile.'
+      );
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Profile</Text>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Text style={styles.pageTitle}>
+        My Profile
+      </Text>
 
-      <View style={styles.avatarWrapper}>
-        <Image
-          source={require('../../assets/icon.jpg')}
-          style={styles.avatar}
-        />
+      <View style={styles.profileCard}>
+        <View style={styles.avatarWrapper}>
+          <Image
+            source={require('../../assets/icon.jpg')}
+            style={styles.avatar}
+            contentFit="cover"
+          />
+        </View>
+
+        <Text style={styles.savedName}>
+          {savedName}
+        </Text>
+
+        <View style={styles.programRow}>
+          <Ionicons
+            name="school-outline"
+            size={18}
+            color={COLORS.primary}
+          />
+
+          <Text style={styles.savedProgram}>
+            {savedProgram}
+          </Text>
+        </View>
       </View>
 
-      <View style={styles.form}>
-        <Text style={styles.label}>Full Name</Text>
+      <View style={styles.editSection}>
+        <View style={styles.editHeader}>
+          <Ionicons
+            name="create-outline"
+            size={22}
+            color={COLORS.primary}
+          />
+
+          <Text style={styles.sectionTitle}>
+            Edit Profile
+          </Text>
+        </View>
+
+        <Text style={styles.label}>
+          Full Name
+        </Text>
 
         <TextInput
           value={fullName}
           onChangeText={(text) => {
             setFullName(text);
-            setNameError('');
-            setSaved(false);
+
+            if (text.trim()) {
+              setNameError('');
+            }
           }}
           placeholder="Enter your full name"
+          placeholderTextColor={COLORS.muted}
           style={[
             styles.input,
             nameError ? styles.inputError : null,
@@ -122,19 +188,34 @@ export default function ProfileScreen() {
         />
 
         {nameError ? (
-          <Text style={styles.error}>{nameError}</Text>
+          <View style={styles.errorRow}>
+            <Ionicons
+              name="alert-circle-outline"
+              size={15}
+              color={COLORS.danger}
+            />
+
+            <Text style={styles.error}>
+              {nameError}
+            </Text>
+          </View>
         ) : null}
 
-        <Text style={styles.label}>Course</Text>
+        <Text style={styles.label}>
+          Course / Program
+        </Text>
 
         <TextInput
           value={program}
           onChangeText={(text) => {
             setProgram(text);
-            setProgramError('');
-            setSaved(false);
+
+            if (text.trim()) {
+              setProgramError('');
+            }
           }}
-          placeholder="Enter your course"
+          placeholder="Enter your course or program"
+          placeholderTextColor={COLORS.muted}
           style={[
             styles.input,
             programError ? styles.inputError : null,
@@ -142,29 +223,28 @@ export default function ProfileScreen() {
         />
 
         {programError ? (
-          <Text style={styles.error}>{programError}</Text>
-        ) : null}
-
-        <AppButton
-          title="Save Profile"
-          icon="save-outline"
-          onPress={saveProfile}
-        />
-
-        {saved && (
-          <View style={styles.successBox}>
+          <View style={styles.errorRow}>
             <Ionicons
-              name="checkmark-circle"
-              size={20}
-              color={COLORS.success}
+              name="alert-circle-outline"
+              size={15}
+              color={COLORS.danger}
             />
-            <Text style={styles.successText}>
-              Profile saved successfully.
+
+            <Text style={styles.error}>
+              {programError}
             </Text>
           </View>
-        )}
+        ) : null}
+
+        <View style={styles.saveButton}>
+          <AppButton
+            title="Save Changes"
+            icon="save-outline"
+            onPress={saveProfile}
+          />
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -172,38 +252,94 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    padding: 20,
   },
 
-  title: {
+  content: {
+    padding: 20,
+    paddingBottom: 60,
+  },
+
+  pageTitle: {
     ...TYPOGRAPHY.title,
     color: COLORS.text,
     marginBottom: 20,
   },
 
-  avatarWrapper: {
+  profileCard: {
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 20,
+    padding: 24,
     alignItems: 'center',
     marginBottom: 24,
   },
 
-  avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+  avatarWrapper: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+    overflow: 'hidden',
   },
 
-  form: {
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+
+  savedName: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+
+  programRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 7,
+  },
+
+  savedProgram: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.muted,
+  },
+
+  editSection: {
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 20,
+    padding: 20,
+  },
+
+  editHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
+    marginBottom: 18,
+  },
+
+  sectionTitle: {
+    ...TYPOGRAPHY.heading,
+    color: COLORS.text,
   },
 
   label: {
     ...TYPOGRAPHY.label,
     color: COLORS.text,
+    marginBottom: 7,
     marginTop: 8,
   },
 
   input: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.background,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderRadius: 12,
@@ -217,23 +353,19 @@ const styles = StyleSheet.create({
     borderColor: COLORS.danger,
   },
 
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 5,
+  },
+
   error: {
     color: COLORS.danger,
     fontSize: 13,
-    marginBottom: 4,
   },
 
-  successBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 10,
-  },
-
-  successText: {
-    color: COLORS.success,
-    fontSize: 14,
-    fontWeight: '600',
+  saveButton: {
+    marginTop: 22,
   },
 });
