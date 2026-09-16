@@ -1,98 +1,203 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import AppButton from '../../components/AppButton';
+import StatCard from '../../components/StatCard';
+import { COLORS, TYPOGRAPHY } from '../../constants/theme';
+import { profile } from '../../data/profile';
+import { tasks } from '../../data/tasks';
 
-export default function HomeScreen() {
+const PROFILE_KEY = '@studyflow_profile';
+
+export default function DashboardScreen() {
+  const router = useRouter();
+
+  const [studentName, setStudentName] = useState(profile.fullName);
+  const [totalTasks, setTotalTasks] = useState(tasks.length);
+  const [pendingTasks, setPendingTasks] = useState(0);
+  const [completedTasks, setCompletedTasks] = useState(0);
+
+  const updateDashboard = () => {
+    setTotalTasks(tasks.length);
+
+    setPendingTasks(
+      tasks.filter((task) => task.status === 'Pending').length
+    );
+
+    setCompletedTasks(
+      tasks.filter((task) => task.status === 'Completed').length
+    );
+  };
+
+  const loadProfile = async () => {
+    try {
+      const savedProfile =
+        await AsyncStorage.getItem(PROFILE_KEY);
+
+      if (savedProfile) {
+        const parsed = JSON.parse(savedProfile);
+
+        profile.fullName = parsed.fullName;
+        profile.program = parsed.program;
+
+        setStudentName(parsed.fullName);
+      } else {
+        setStudentName(profile.fullName);
+      }
+    } catch {
+      setStudentName(profile.fullName);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile();
+      updateDashboard();
+    }, [])
+  );
+
+  const firstName =
+    studentName.trim().split(' ')[0] || 'Student';
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+    >
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>
+            Welcome back,
+          </Text>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+          <Text style={styles.name}>
+            {firstName}!
+          </Text>
+        </View>
+
+        <View style={styles.iconCircle}>
+          <Ionicons
+            name="person-outline"
+            size={24}
+            color={COLORS.primary}
+          />
+        </View>
+      </View>
+
+      <Text style={styles.subtitle}>
+        Stay organized and keep up with your studies.
+      </Text>
+
+      <View style={styles.stats}>
+        <StatCard
+          title="Total Tasks"
+          value={String(totalTasks)}
+          icon="list-outline"
+        />
+
+        <StatCard
+          title="Pending"
+          value={String(pendingTasks)}
+          icon="time-outline"
+        />
+
+        <StatCard
+          title="Completed"
+          value={String(completedTasks)}
+          icon="checkmark-circle-outline"
+        />
+      </View>
+
+      <View style={styles.quickAction}>
+        <Text style={styles.sectionTitle}>
+          Quick Action
+        </Text>
+
+        <AppButton
+          title="Browse My Tasks"
+          icon="list-outline"
+          onPress={() => router.push('/tasks')}
+        />
+      </View>
+
+      <View style={styles.profileAction}>
+        <AppButton
+          title="Edit Profile"
+          icon="person-outline"
+          variant="secondary"
+          onPress={() => router.push('/profile')}
+        />
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+
+  content: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+
+  greeting: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.muted,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+
+  name: {
+    ...TYPOGRAPHY.title,
+    color: COLORS.text,
+  },
+
+  subtitle: {
+    ...TYPOGRAPHY.body,
+    color: COLORS.muted,
+    marginTop: 6,
+    marginBottom: 24,
+  },
+
+  iconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  stats: {
+    gap: 12,
+  },
+
+  quickAction: {
+    marginTop: 28,
+  },
+
+  sectionTitle: {
+    ...TYPOGRAPHY.heading,
+    color: COLORS.text,
+    marginBottom: 12,
+  },
+
+  profileAction: {
+    marginTop: 12,
   },
 });
