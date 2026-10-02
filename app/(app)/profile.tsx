@@ -95,7 +95,7 @@ export default function ProfileScreen() {
       </View>
       <Text style={styles.text}>Session Status: {token ? 'Authenticated' : 'Not Available'}</Text>
       <Pressable accessibilityRole="button" style={styles.button} onPress={logout}><Text style={styles.buttonText}>LOGOUT</Text></Pressable>
-      <Text style={styles.note}>Exam starter: complete logout() in AuthContext.</Text>
+      <Text style={styles.note}>Logging out clears the current session.</Text>
     </ScrollView>
   );
 }

@@ -4,32 +4,35 @@
 
 ### Student Information
 
-Name:
+Name: MICHAELA DARRY G. BAGAY
 
-Section:
+Section: CCE106 2013
 
-Date:
+Date: OCTOBER 3, 2026
 
 ### Required Features
 
-- [ ] Login
-- [ ] Authentication state
-- [ ] Secure token storage
-- [ ] Protected navigation
-- [ ] Dashboard
-- [ ] Student API request
-- [ ] Loading state
-- [ ] Error state
-- [ ] Empty state
-- [ ] Search/filter
-- [ ] Dynamic student details
-- [ ] Profile
-- [ ] Session restoration
-- [ ] Logout
+- [x] Login
+- [x] Authentication state
+- [x] Secure token storage implementation
+- [x] Protected navigation
+- [x] Dashboard
+- [x] Student API request
+- [x] Loading state
+- [x] Error state
+- [x] Empty state
+- [x] Search/filter
+- [x] Dynamic student details
+- [x] Profile
+- [x] Session restoration implementation
+- [x] Logout
+
+Native Android/iOS SecureStore persistence verification remains pending.
 
 ### API
 
-Base URL: `REPLACE_WITH_EXAM_API` (set in `constants/api.ts`)
+Base URL: configure `EXPO_PUBLIC_API_URL`, with `http://localhost:3000` as the
+same-computer web fallback in `constants/api.ts`.
 
 POST /login
 
@@ -39,7 +42,7 @@ GET /students/{id}
 
 GET /profile
 
-Use the instructor's API documentation for payloads and response fields.
+See `server/README.md` for the local exam API contract and testing credentials.
 
 ### How to Run
 
@@ -50,19 +53,18 @@ npx expo start
 
 Press `w` for web, or run `npm run web` directly.
 
-The starter opens the dashboard without authentication so its screens can be inspected.
-Use **Open Sign In** to preview the login screen. Login, logout, and View Details
-buttons intentionally do nothing until their TODOs are completed. Student screens
-initially show loading until students implement the loaders. Preview the detail
-layout on web at `/student/1`; this does not create a sample API record.
+The app opens the sign-in screen when no valid session is available. After login,
+Expo Router protects the application tabs and the dynamic student detail route.
+Student and profile records are loaded from the local exam API, and **View Details**
+opens the matching `/student/[id]` route.
 
-Search for `TODO EXAM` throughout the project. No requests or credentials are
-provided. Protect both the application tabs and the student detail route.
+Search for `TODO EXAM` throughout the project. The seeded testing credentials are
+documented in `server/README.md`.
 
-Expo SecureStore is used only in `context/AuthContext.tsx`. Its methods are not
-implemented in this starter. SecureStore supports native platforms, not web;
-check availability before calling it and verify secure session persistence on
-Android/iOS. See the [Expo SDK 54 SecureStore documentation](https://docs.expo.dev/versions/v54.0.0/sdk/securestore/).
+Expo SecureStore is used only in `context/AuthContext.tsx` on supported native
+platforms. Web sessions remain memory-only. The native implementation is complete,
+but secure session persistence still needs verification on Android/iOS. See the
+[Expo SDK 54 SecureStore documentation](https://docs.expo.dev/versions/v54.0.0/sdk/securestore/).
 
 Compiler and lint checks:
 

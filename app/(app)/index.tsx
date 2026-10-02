@@ -23,7 +23,7 @@ export default function DashboardScreen() {
         {!user ? <Text style={styles.note}>Authenticated user details are not available.</Text> : null}
       </View>
       <Link href="/sign-in" style={styles.link}>Open Sign In</Link>
-      <Text style={styles.note}>Exam starter: screens are accessible while route protection is incomplete.</Text>
+      <Text style={styles.note}>Authenticated routes are protected by your current session.</Text>
     </ScrollView>
   );
 }
