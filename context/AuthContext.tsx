@@ -142,8 +142,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void restoreSession();
   }, [restoreSession]);
 
-  // SecureStore is native-only. Web sessions remain in memory and are not persisted.
-  // TODO EXAM: Test secure session persistence on Android/iOS after restoration is implemented.
   return (
     <AuthContext.Provider value={{ token, user, authLoading, login, logout, restoreSession }}>
       {children}
