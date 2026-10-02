@@ -76,8 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(null);
       setUser(null);
     }
-
-    // TODO EXAM: Redirect to /sign-in after logout.
   };
 
   const restoreSession = useCallback(async () => {
