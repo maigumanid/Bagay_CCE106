@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 // TODO EXAM: Match these fields to the provided API response.
@@ -10,8 +11,21 @@ export type Student = {
 
 export default function StudentCard({ student }: { student: Student }) {
   const handleViewDetails = () => {
-    // TODO EXAM: Check that the student has an id.
-    // TODO EXAM: Use Expo Router to navigate to /student/[id] with this student's id.
+    if (student.id === null || student.id === undefined) {
+      return;
+    }
+
+    if (typeof student.id === 'number' && !Number.isFinite(student.id)) {
+      return;
+    }
+
+    const id = String(student.id).trim();
+
+    if (!id) {
+      return;
+    }
+
+    router.push({ pathname: '/student/[id]', params: { id } });
   };
 
   return (

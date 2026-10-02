@@ -22,8 +22,10 @@ export default function StudentsScreen() {
     // TODO EXAM: Call loadStudents() when the screen loads.
   }, []);
 
-  // TODO EXAM: Use filter() to return students whose name matches the search text.
-  const filteredStudents = students;
+  const normalizedSearch = search.trim().toLowerCase();
+  const filteredStudents = normalizedSearch
+    ? students.filter((student) => student.name?.toLowerCase().includes(normalizedSearch))
+    : students;
 
   return (
     <View style={styles.container}>

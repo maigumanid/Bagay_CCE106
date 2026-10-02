@@ -5,14 +5,14 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { type Student } from '@/components/StudentCard';
 
 export default function StudentDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id?: string | string[] }>();
+  const studentId = (Array.isArray(id) ? id[0] : id)?.trim() ?? '';
   const router = useRouter();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const loadStudent = async () => {
-    // TODO EXAM: Validate the id read from useLocalSearchParams().
     // TODO EXAM: Set loading and clear previous errors.
     // TODO EXAM: GET /students/{id} with fetch(), async/await, and a Bearer token.
     // TODO EXAM: Check response.ok; handle 401 Unauthorized and missing records.
@@ -22,16 +22,17 @@ export default function StudentDetailsScreen() {
 
   useEffect(() => {
     // TODO EXAM: Call loadStudent() when id changes.
-  }, [id]);
+  }, [studentId]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Student Details</Text>
-      {loading ? <View style={styles.state}><ActivityIndicator color="#245bb2" /><Text style={styles.text}>Loading student…</Text></View>
+      {!studentId ? <Text style={styles.error} accessibilityLiveRegion="polite">A valid student id is required.</Text>
+        : loading ? <View style={styles.state}><ActivityIndicator color="#245bb2" /><Text style={styles.text}>Loading student…</Text></View>
         : error ? <Text style={styles.error} accessibilityLiveRegion="polite">{error}</Text>
         : !student ? <Text style={styles.text}>No student record available.</Text> : null}
       <View style={styles.card}>
-        <Text style={styles.text}>ID: {id || 'Not available'}</Text>
+        <Text style={styles.text}>ID: {studentId || 'Not available'}</Text>
         <Text style={styles.text}>Name: {student?.name || '—'}</Text>
         <Text style={styles.text}>Email: {student?.email || '—'}</Text>
         <Text style={styles.text}>Course: {student?.course || '—'}</Text>
