@@ -1,28 +1,98 @@
-/* eslint-disable @typescript-eslint/no-unused-vars -- State setters and loader are exam placeholders. */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { type Student } from '@/components/StudentCard';
+import { API_BASE_URL } from '@/constants/api';
+import { useAuth } from '@/hooks/useAuth';
+
+function isStudent(value: unknown): value is Student {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const student = value as Record<string, unknown>;
+
+  return typeof student.id === 'number'
+    && Number.isFinite(student.id)
+    && typeof student.name === 'string'
+    && typeof student.email === 'string'
+    && typeof student.course === 'string';
+}
 
 export default function StudentDetailsScreen() {
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const studentId = (Array.isArray(id) ? id[0] : id)?.trim() ?? '';
   const router = useRouter();
+  const { token } = useAuth();
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadStudent = async () => {
-    // TODO EXAM: Set loading and clear previous errors.
-    // TODO EXAM: GET /students/{id} with fetch(), async/await, and a Bearer token.
-    // TODO EXAM: Check response.ok; handle 401 Unauthorized and missing records.
-    // TODO EXAM: Parse JSON and update student state.
-    // TODO EXAM: Handle errors and stop loading in finally.
-  };
+  const loadStudent = useCallback(async () => {
+    if (!studentId) {
+      setStudent(null);
+      setError('A valid student id is required.');
+      setLoading(false);
+      return;
+    }
+
+    if (!token) {
+      setStudent(null);
+      setError('Please sign in to view student details.');
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setStudent(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/students/${encodeURIComponent(studentId)}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Your session is not authorized to view this student.');
+        }
+
+        if (response.status === 404) {
+          throw new Error('Student not found.');
+        }
+
+        throw new Error('The student service is unavailable. Please try again.');
+      }
+
+      let data: unknown;
+
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error('The student service returned an invalid response.');
+      }
+
+      if (!isStudent(data)) {
+        throw new Error('The student service returned an invalid response.');
+      }
+
+      setStudent(data);
+    } catch (caughtError) {
+      if (caughtError instanceof TypeError) {
+        setError('Unable to connect to the student service. Check the API and try again.');
+      } else {
+        setError(caughtError instanceof Error ? caughtError.message : 'Unable to load this student. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [studentId, token]);
 
   useEffect(() => {
-    // TODO EXAM: Call loadStudent() when id changes.
-  }, [studentId]);
+    void loadStudent();
+  }, [loadStudent]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
