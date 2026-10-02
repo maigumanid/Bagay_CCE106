@@ -1,9 +1,11 @@
-// TODO EXAM: Use the API base URL provided by the instructor.
-export const API_BASE_URL = "https://jsonplaceholder.typicode.com";
+const configuredApiUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
+
+// localhost supports Expo web on the API computer. Native devices should set
+// EXPO_PUBLIC_API_URL in .env.local to the computer's reachable LAN URL.
+export const API_BASE_URL = (configuredApiUrl || 'http://localhost:3000').replace(/\/+$/, '');
 
 // Expected endpoints:
 // POST /login
 // GET /students
 // GET /students/{id}
 // GET /profile
-// TODO EXAM: Confirm request/response fields against the instructor's API documentation.
